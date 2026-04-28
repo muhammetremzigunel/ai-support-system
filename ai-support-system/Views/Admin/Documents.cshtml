@@ -1,0 +1,225 @@
+@{
+    ViewData["Title"] = "Belge Yönetimi";
+}
+
+<div class="max-w-6xl mx-auto space-y-8">
+
+    <!-- ADD DOCUMENT SECTION -->
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700 overflow-hidden transition-colors duration-300">
+        <div class="bg-slate-900 dark:bg-slate-950 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                </div>
+                <h2 class="text-white font-semibold text-lg">Belge Ekle</h2>
+            </div>
+            <a href="/Admin"
+               class="px-4 py-2 rounded-lg text-sm font-medium border border-slate-600 text-slate-300 hover:text-white hover:border-slate-400 hover:bg-slate-800 transition-all duration-200">
+                Kullanıcı Yönetimi
+            </a>
+        </div>
+        <div class="p-6">
+            @if (ViewBag.Success != null)
+            {
+                <div class="mb-6 flex items-start gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 border-l-4 border-emerald-500 rounded-r-lg animate-[fadeIn_0.3s_ease-out]">
+                    <svg class="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.06l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                    </svg>
+                    <p class="text-sm font-medium text-emerald-800 dark:text-emerald-200">@ViewBag.Success</p>
+                </div>
+            }
+            <form asp-controller="Admin" asp-action="AddDocument" method="post">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Kategori</label>
+                        <input type="text" name="newCategory"
+                               class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-white placeholder-slate-400 dark:placeholder-slate-500
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 transition-all duration-200"
+                               placeholder="Kategori yaz..." autocomplete="off" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Başlık</label>
+                        <input type="text" name="newTitle"
+                               class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-white placeholder-slate-400 dark:placeholder-slate-500
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 transition-all duration-200"
+                               placeholder="Başlık yaz..." autocomplete="off" />
+                    </div>
+                </div>
+                <div class="mb-5">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">İçerik</label>
+                    <textarea name="content" rows="5"
+                              class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 resize-y
+                                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 transition-all duration-200"
+                              placeholder="Belge içeriğini yazın..."></textarea>
+                </div>
+                <button type="submit"
+                        class="px-6 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700
+                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800
+                               transition-all duration-200 shadow-sm hover:shadow-md">
+                    Ekle
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- FILTER SECTION -->
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700 overflow-hidden transition-colors duration-300">
+        <div class="bg-slate-700 dark:bg-slate-950 px-6 py-3">
+            <h2 class="text-white font-semibold text-base">Filtrele</h2>
+        </div>
+        <div class="p-6">
+            <form asp-controller="Admin" asp-action="Documents" method="get">
+                <div class="flex flex-col md:flex-row gap-3">
+                    <div class="flex-1">
+                        <select name="category"
+                                class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-white
+                                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 transition-all duration-200
+                                       appearance-none cursor-pointer">
+                            <option value="">-- Tüm Kategoriler --</option>
+                            @{
+                                var categories = ViewBag.Categories as List<string> ?? new List<string>();
+                            }
+                            @foreach (var cat in categories)
+                            {
+                                <option value="@cat" selected="@(ViewBag.SelectedCategory == cat ? "selected" : null)">@cat</option>
+                            }
+                        </select>
+                    </div>
+                    <button type="submit"
+                            class="px-6 py-3 bg-slate-700 dark:bg-slate-600 text-white text-sm font-medium rounded-xl hover:bg-slate-800 dark:hover:bg-slate-500
+                                   focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800
+                                   transition-all duration-200 shadow-sm">
+                        Filtrele
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- DOCUMENTS TABLE -->
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700 overflow-hidden transition-colors duration-300">
+        <div class="bg-slate-900 dark:bg-slate-950 px-6 py-4">
+            <h2 class="text-white font-semibold text-lg">Kayıtlı Belgeler</h2>
+        </div>
+        <div class="p-6">
+            @{
+                var documents = ViewBag.Documents as List<AiSupportApp.Models.DocumentModel> ?? new List<AiSupportApp.Models.DocumentModel>();
+            }
+            @if (documents.Count > 0)
+            {
+                <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-slate-900 dark:bg-slate-950 text-white">
+                                <th class="px-5 py-3.5 text-left font-semibold text-xs uppercase tracking-wider">Kategori</th>
+                                <th class="px-5 py-3.5 text-left font-semibold text-xs uppercase tracking-wider">Başlık</th>
+                                <th class="px-5 py-3.5 text-left font-semibold text-xs uppercase tracking-wider">İçerik</th>
+                                <th class="px-5 py-3.5 text-left font-semibold text-xs uppercase tracking-wider">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                            @foreach (var doc in documents)
+                            {
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors duration-150">
+                                    <td class="px-5 py-4 text-slate-700 dark:text-slate-200 font-medium">@doc.Category</td>
+                                    <td class="px-5 py-4 text-slate-700 dark:text-slate-200">@doc.Title</td>
+                                    <td class="px-5 py-4 text-slate-500 dark:text-slate-400 max-w-xs truncate">@doc.Content</td>
+                                    <td class="px-5 py-4">
+                                        <div class="flex items-center gap-2">
+                                            <button type="button"
+                                                    onclick="openEdit('@doc.Id', '@doc.Category', '@doc.Title', '@doc.Content')"
+                                                    class="px-3 py-1.5 text-xs font-medium rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-700
+                                                           hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors duration-200">
+                                                Düzenle
+                                            </button>
+                                            <form asp-controller="Admin" asp-action="DeleteDocument" method="post" class="inline">
+                                                <input type="hidden" name="id" value="@doc.Id" />
+                                                <button type="submit"
+                                                        class="px-3 py-1.5 text-xs font-medium rounded-lg bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700
+                                                               hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors duration-200">
+                                                    Sil
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-12">
+                    <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium">Henüz belge eklenmedi.</p>
+                    <p class="text-slate-400 dark:text-slate-500 text-sm mt-1">Yukarıdaki formu kullanarak yeni belgeler ekleyebilirsiniz.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+</div>
+
+<!-- EDIT DIALOG -->
+<dialog id="editModal" class="p-0 rounded-2xl shadow-2xl border-0 w-full max-w-2xl bg-white dark:bg-slate-800">
+    <div class="bg-slate-900 dark:bg-slate-950 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+        <h2 class="text-white font-semibold text-lg">Belge Düzenle</h2>
+        <button type="button" onclick="document.getElementById('editModal').close()"
+                class="text-slate-400 hover:text-white transition-colors duration-200 p-1 rounded-lg hover:bg-slate-800">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+    <form asp-controller="Admin" asp-action="EditDocument" method="post">
+        <div class="p-6 space-y-5">
+            <input type="hidden" id="editId" name="id" />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Kategori</label>
+                    <input type="text" id="editCategory" name="newCategory"
+                           class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-white
+                                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 transition-all duration-200"
+                           autocomplete="off" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Başlık</label>
+                    <input type="text" id="editTitle" name="newTitle"
+                           class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-white
+                                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 transition-all duration-200"
+                           autocomplete="off" />
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">İçerik</label>
+                <textarea id="editContent" name="content" rows="6"
+                          class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-white resize-y
+                                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 transition-all duration-200"></textarea>
+            </div>
+        </div>
+        <div class="px-6 py-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 rounded-b-2xl flex items-center justify-end gap-3">
+            <button type="button" onclick="document.getElementById('editModal').close()"
+                    class="px-5 py-2.5 text-sm font-medium rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700
+                           transition-all duration-200">
+                İptal
+            </button>
+            <button type="submit"
+                    class="px-5 py-2.5 text-sm font-semibold rounded-xl bg-blue-600 text-white hover:bg-blue-700
+                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800
+                           transition-all duration-200 shadow-sm">
+                Kaydet
+            </button>
+        </div>
+    </form>
+</dialog>
+
+@section Scripts {
+    <script src="~/js/admin.js"></script>
+}

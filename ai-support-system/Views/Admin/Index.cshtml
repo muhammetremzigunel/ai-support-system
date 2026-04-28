@@ -1,0 +1,94 @@
+@{
+    ViewData["Title"] = "Kullanıcı Yönetimi";
+}
+
+<div class="max-w-6xl mx-auto">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700 overflow-hidden transition-colors duration-300">
+
+        <div class="bg-slate-900 dark:bg-slate-950 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                    </svg>
+                </div>
+                <h2 class="text-white font-semibold text-lg">Kullanıcı Yönetimi</h2>
+            </div>
+            <a href="/Admin/Documents"
+               class="px-4 py-2 rounded-lg text-sm font-medium border border-slate-600 text-slate-300 hover:text-white hover:border-slate-400 hover:bg-slate-800 transition-all duration-200">
+                Belge Yönetimi
+            </a>
+        </div>
+
+        <div class="p-6">
+            @{
+                var users = ViewBag.Users as List<(Microsoft.AspNetCore.Identity.IdentityUser User, string Role)>
+                            ?? new List<(Microsoft.AspNetCore.Identity.IdentityUser, string)>();
+            }
+            @if (users.Count > 0)
+            {
+                <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-slate-900 dark:bg-slate-950 text-white">
+                                <th class="px-5 py-3.5 text-left font-semibold text-xs uppercase tracking-wider">Email</th>
+                                <th class="px-5 py-3.5 text-left font-semibold text-xs uppercase tracking-wider">Rol</th>
+                                <th class="px-5 py-3.5 text-left font-semibold text-xs uppercase tracking-wider">Rol Değiştir</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                            @foreach (var item in users)
+                            {
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors duration-150">
+                                    <td class="px-5 py-4 text-slate-700 dark:text-slate-200 font-medium">@item.User.Email</td>
+                                    <td class="px-5 py-4">
+                                        @if (item.Role == "admin")
+                                        {
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300">
+                                                @item.Role
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                                                @item.Role
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="px-5 py-4">
+                                        <form asp-controller="Admin" asp-action="ChangeRole" method="post" class="flex items-center gap-2">
+                                            <input type="hidden" name="userId" value="@item.User.Id" />
+                                            <select name="newRole"
+                                                    class="px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-700 dark:text-white
+                                                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 transition-all duration-200">
+                                                <option value="user" selected="@(item.Role == "user" ? "selected" : null)">user</option>
+                                                <option value="admin" selected="@(item.Role == "admin" ? "selected" : null)">admin</option>
+                                            </select>
+                                            <button type="submit"
+                                                    class="px-4 py-2 text-sm font-medium rounded-lg bg-slate-900 dark:bg-blue-600 text-white hover:bg-slate-800 dark:hover:bg-blue-700
+                                                           focus:outline-none focus:ring-2 focus:ring-slate-500 dark:focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800
+                                                           transition-all duration-200 shadow-sm">
+                                                Kaydet
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-12">
+                    <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                        </svg>
+                    </div>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium">Kullanıcı bulunamadı.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

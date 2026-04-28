@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="~/favicon.png" />
+    <title>@ViewData["Title"] - AI Destek</title>
+
+    <!-- FOUC Prevention: Apply dark class before any rendering -->
+    <script>
+        (function() {
+            const theme = localStorage.getItem('theme');
+            if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
+
+    <!-- Tailwind CSS (Play CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/AiSupportApp.styles.css" asp-append-version="true" />
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 font-sans text-slate-700 dark:text-slate-100 antialiased transition-colors duration-300">
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- FIXED NAVBAR                            -->
+    <!-- ═══════════════════════════════════════ -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-800 dark:border-slate-700 shadow-lg">
+        <nav class="container mx-auto px-4 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+
+                <!-- Brand -->
+                <a asp-controller="Chat" asp-action="Index"
+                   class="text-white font-bold text-xl tracking-tight hover:text-blue-400 transition-colors duration-200">
+                    AI Destek
+                </a>
+
+                <!-- Mobile Toggle -->
+                <button id="mobile-menu-btn" type="button"
+                        class="lg:hidden inline-flex items-center justify-center p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors duration-200"
+                        aria-label="Menüyü aç">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+
+                <!-- Desktop Nav -->
+                <div class="hidden lg:flex lg:items-center lg:gap-1">
+                    <!-- Left Links -->
+                    <div class="flex items-center gap-1 mr-8">
+                        <a asp-controller="Chat" asp-action="Index"
+                           class="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-all duration-200">
+                            Chat
+                        </a>
+                        @if (User.IsInRole("admin"))
+                        {
+                            <a asp-controller="Admin" asp-action="Index"
+                               class="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-all duration-200">
+                                Admin
+                            </a>
+                        }
+                    </div>
+
+                    <!-- Right Links + Theme Toggle -->
+                    <div class="flex items-center gap-3">
+
+                        <!-- Dark/Light Mode Toggle -->
+                        <button id="theme-toggle" type="button"
+                                class="p-2 rounded-full text-slate-400 hover:text-white hover:bg-slate-700 dark:hover:bg-slate-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+                                aria-label="Tema değiştir">
+                            <!-- Sun Icon (visible in dark mode → click to go light) -->
+                            <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            <!-- Moon Icon (visible in light mode → click to go dark) -->
+                            <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                            </svg>
+                        </button>
+
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <span class="text-sm text-slate-400">@User.Identity.Name</span>
+                            <form asp-controller="Auth" asp-action="Logout" method="post" class="m-0 p-0">
+                                <button type="submit"
+                                        class="px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-red-600/20 transition-all duration-200">
+                                    Çıkış
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a asp-controller="Auth" asp-action="Login"
+                               class="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-all duration-200">
+                                Giriş Yap
+                            </a>
+                            <a asp-controller="Auth" asp-action="Register"
+                               class="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 shadow-sm">
+                                Kayıt Ol
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Nav (hidden by default) -->
+            <div id="mobile-menu" class="hidden lg:hidden pb-4 border-t border-slate-800 mt-2 pt-4 space-y-1">
+                <a asp-controller="Chat" asp-action="Index"
+                   class="block px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors duration-200">
+                    Chat
+                </a>
+                @if (User.IsInRole("admin"))
+                {
+                    <a asp-controller="Admin" asp-action="Index"
+                       class="block px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors duration-200">
+                        Admin
+                    </a>
+                }
+                <div class="border-t border-slate-800 my-2"></div>
+
+                <!-- Mobile Theme Toggle -->
+                <button id="theme-toggle-mobile" type="button"
+                        class="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors duration-200">
+                    <!-- Sun Icon (dark mode active) -->
+                    <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <!-- Moon Icon (light mode active) -->
+                    <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                    <span class="dark:hidden">Karanlık Mod</span>
+                    <span class="hidden dark:inline">Aydınlık Mod</span>
+                </button>
+
+                <div class="border-t border-slate-800 my-2"></div>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <span class="block px-4 py-2 text-sm text-slate-400">@User.Identity.Name</span>
+                    <form asp-controller="Auth" asp-action="Logout" method="post" class="m-0 p-0">
+                        <button type="submit"
+                                class="w-full text-left px-4 py-2 rounded-lg text-sm font-medium text-red-400 hover:bg-red-600/20 transition-colors duration-200">
+                            Çıkış
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Auth" asp-action="Login"
+                       class="block px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors duration-200">
+                        Giriş Yap
+                    </a>
+                    <a asp-controller="Auth" asp-action="Register"
+                       class="block px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 text-center">
+                        Kayıt Ol
+                    </a>
+                }
+            </div>
+        </nav>
+    </header>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- MAIN CONTENT                            -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="container mx-auto px-4 lg:px-8 pt-24 pb-8">
+        <main role="main" class="min-h-[calc(100vh-12rem)]">
+
+            @if (ViewData["Error"] != null)
+            {
+                <!-- Error Banner — ViewData -->
+                <div class="mb-6 flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-r-xl shadow-sm animate-[fadeIn_0.3s_ease-out]">
+                    <div class="flex-shrink-0 mt-0.5">
+                        <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <p class="text-sm font-medium text-red-800 dark:text-red-200">@ViewData["Error"]</p>
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <!-- Error Banner — TempData -->
+                <div class="mb-6 flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-r-xl shadow-sm animate-[fadeIn_0.3s_ease-out]">
+                    <div class="flex-shrink-0 mt-0.5">
+                        <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <p class="text-sm font-medium text-red-800 dark:text-red-200">@TempData["Error"]</p>
+                </div>
+            }
+
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- FOOTER                                  -->
+    <!-- ═══════════════════════════════════════ -->
+    <footer class="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-6 text-center transition-colors duration-300">
+        <small class="text-slate-400 dark:text-slate-500 text-sm">&copy; 2026 AI Destek</small>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        // Mobile menu toggle
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (menuBtn && mobileMenu) {
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        // ═══════════════════════════════════════
+        // DARK / LIGHT MODE TOGGLE
+        // ═══════════════════════════════════════
+        (function () {
+            const html = document.documentElement;
+            const toggleDesktop = document.getElementById('theme-toggle');
+            const toggleMobile = document.getElementById('theme-toggle-mobile');
+
+            function toggleTheme() {
+                if (html.classList.contains('dark')) {
+                    html.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    html.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                }
+            }
+
+            if (toggleDesktop) toggleDesktop.addEventListener('click', toggleTheme);
+            if (toggleMobile) toggleMobile.addEventListener('click', toggleTheme);
+        })();
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

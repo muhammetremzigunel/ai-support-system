@@ -1,0 +1,72 @@
+@{
+    ViewData["Title"] = "Kayıt Ol";
+}
+
+<div class="flex items-center justify-center min-h-[calc(100vh-16rem)]">
+    <div class="w-full max-w-md">
+        <!-- Register Card -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-slate-100 dark:border-slate-700 transition-colors duration-300">
+
+            <!-- Card Header -->
+            <div class="bg-slate-900 dark:bg-slate-950 px-8 py-6 text-center">
+                <div class="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
+                </div>
+                <h1 class="text-white font-bold text-xl">Kayıt Ol</h1>
+                <p class="text-slate-400 text-sm mt-1">Yeni bir hesap oluşturun</p>
+            </div>
+
+            <!-- Card Body -->
+            <div class="px-8 py-8">
+                @if (ViewBag.Error != null)
+                {
+                    <div class="mb-6 flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-r-lg">
+                        <svg class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                        </svg>
+                        <p class="text-sm font-medium text-red-800 dark:text-red-200">@ViewBag.Error</p>
+                    </div>
+                }
+
+                <form asp-controller="Auth" asp-action="Register" method="post" class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Email</label>
+                        <input type="email" name="Email"
+                               class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-white placeholder-slate-400 dark:placeholder-slate-500
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-all duration-200"
+                               placeholder="email@örnek.com" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Şifre</label>
+                        <input type="password" name="Password"
+                               class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-white placeholder-slate-400 dark:placeholder-slate-500
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-all duration-200"
+                               placeholder="Şifrenizi girin" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Şifre Tekrar</label>
+                        <input type="password" name="ConfirmPassword"
+                               class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-white placeholder-slate-400 dark:placeholder-slate-500
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-all duration-200"
+                               placeholder="Şifrenizi tekrar girin" />
+                    </div>
+                    <button type="submit"
+                            class="w-full py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700
+                                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800
+                                   transition-all duration-200 shadow-sm hover:shadow-md">
+                        Kayıt Ol
+                    </button>
+                </form>
+
+                <div class="mt-6 pt-6 border-t border-slate-100 dark:border-slate-700 text-center">
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                        Zaten hesabınız var mı?
+                        <a href="/Auth/Login" class="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-200">Giriş Yap</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
