@@ -241,15 +241,13 @@ VALUES ('YOUR_USER_ID', 'YOUR_ADMIN_ID');
 
 ---
 
-## ⚠️ Development & Architecture Note
-
-This project is a **Proof of Concept (PoC)** designed to demonstrate RAG (Retrieval-Augmented Generation) logic, AI integration, and modern UI patterns in ASP.NET Core. To keep the focus on core AI engineering and architectural flow, certain production-level hardening steps were intentionally simplified:
-
-- **Security & Secrets:** For local development convenience, some configurations use direct JSON settings. In a production environment, secrets are managed via `Environment Variables` or `Azure Key Vault`, and compromised keys are rotated.
-- **Dependency Inversion:** Services are registered as concrete types for rapid prototyping. A production-ready version would implement full interface-based abstractions (`IRagPipeline`, etc.) to support Unit Testing and SOLID compliance.
-- **LLM Safety:** To showcase raw LLM output and Markdown rendering, server-side HTML sanitization is minimal. In a public-facing app, a library like `Ganss.Xss` would be integrated to prevent XSS from untrusted AI responses.
-
-*These decisions are intentional to keep the codebase readable and focused on the RAG pipeline logic.*
+## Roadmap  
+  
+- [x] RAG Pipeline integration with Gemini AI & Qdrant
+- [x] Recursive Character Text Splitting with `cl100k_base`
+- [ ] Interface-based abstractions for full testability  
+- [ ] Server-side HTML sanitization for LLM output  
+- [ ] Docker Compose setup for local environment
 
 ## License
 
