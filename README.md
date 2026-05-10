@@ -24,14 +24,19 @@
 
 ```
 ai-support-system/
-├── ai-support-system.slnx                    # Solution file
+├── .dockerignore
+├── .env                                 # Not added to Git
+├── ai-support-system.slnx               # Solution file
+├── Dockerfile
+├── docker-compose.yml
 ├── LICENSE.txt
 ├── README.md
 │
 └── ai-support-system/
-    ├── ai-support-system.csproj              # .NET 10 project definition & NuGet packages
+    ├── ai-support-system.csproj         # .NET 10 project definition & NuGet packages
     ├── Program.cs                       # Application bootstrap, DI, middleware pipeline
     ├── appsettings.json                 # Configuration (Gemini, Qdrant, JWT, DB)
+    ├── appsettings.Development.json     # Not added to Git
     │
     ├── Controllers/
     │   ├── AdminController.cs           # [Authorize(Roles="admin")] — User & document management
