@@ -135,8 +135,11 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseHsts();
 }
-
-app.UseHttpsRedirection();
+else
+{
+    // Development ortamında HTTPS yönlendirmesi aktif, Docker (Production) ortamında reverse proxy kullanılır
+    app.UseHttpsRedirection();
+}
 app.UseRouting();
 app.UseSession();
 app.UseAuthentication();
@@ -148,9 +151,13 @@ app.MapControllerRoute(
     pattern: "{controller=Chat}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-// Rolleri ve Qdrant koleksiyonunu oluştur
+// Veritabanı migration, roller ve Qdrant koleksiyonunu oluştur
 using (var scope = app.Services.CreateScope())
 {
+    // Bekleyen EF Core migration'larını otomatik uygula
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await db.Database.MigrateAsync();
+
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
     string[] roles = { "admin", "user" };
