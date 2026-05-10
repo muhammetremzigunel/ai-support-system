@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 # Custom Rules
 appsettings.Development.json
+.env

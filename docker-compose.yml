@@ -1,0 +1,65 @@
+services:
+  # ─── PostgreSQL ───
+  postgres:
+    image: postgres:17-alpine
+    container_name: aisupport-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-aisupportdb}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD gerekli}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-aisupportdb}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ─── Qdrant Vector DB ───
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: aisupport-qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/localhost/6333' || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ─── ASP.NET Core App ───
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aisupport-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-aisupportdb};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}"
+      Qdrant__Host: qdrant
+      Qdrant__Port: 6334
+      Gemini__ApiKey: ${GEMINI_API_KEY:?GEMINI_API_KEY gerekli}
+      Gemini__Model: ${GEMINI_MODEL:-gemini-2.5-flash}
+      Gemini__EmbeddingModel: ${GEMINI_EMBEDDING_MODEL:-gemini-embedding-001}
+      Jwt__Secret: ${JWT_SECRET:?JWT_SECRET gerekli (min 32 karakter)}
+      Jwt__Issuer: ${JWT_ISSUER:-AiSupportApp}
+      Jwt__Audience: ${JWT_AUDIENCE:-AiSupportApp}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  qdrant_data:
