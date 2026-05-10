@@ -226,6 +226,107 @@ INSERT INTO "AspNetUserRoles" ("UserId", "RoleId")
 VALUES ('YOUR_USER_ID', 'YOUR_ADMIN_ID');
 ```
 
+---
+
+## Docker Deployment
+
+Run the entire stack — **ASP.NET Core app**, **PostgreSQL**, and **Qdrant** — with a single command using Docker Compose.
+
+### Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/) (v20.10+)
+- [Docker Compose](https://docs.docker.com/compose/install/) (v2.0+ — included with Docker Desktop)
+
+### 1. Create the `.env` file
+
+Create a `.env` file in the **project root** (next to `docker-compose.yml`):
+
+```env
+# ─── PostgreSQL ───
+POSTGRES_DB=aisupportdb
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=BURAYA_GUCLU_SIFRE_YAZIN
+
+# ─── Gemini API ───
+GEMINI_API_KEY=BURAYA_GEMINI_API_KEY_YAZIN
+GEMINI_MODEL=gemini-2.5-flash
+GEMINI_EMBEDDING_MODEL=gemini-embedding-001
+
+# ─── JWT ───
+JWT_SECRET=BURAYA_EN_AZ_32_KARAKTERLIK_GIZLI_ANAHTAR_YAZIN
+JWT_ISSUER=AiSupportApp
+JWT_AUDIENCE=AiSupportApp
+```
+
+> [!CAUTION]
+> **Never commit `.env` to version control.** The `.gitignore` already excludes it. Replace all placeholder values with your own credentials before starting.
+
+### 2. Build & Start
+
+```bash
+# Build and start all services in detached mode
+docker compose up -d --build
+```
+
+The first build will take a few minutes as it downloads base images and restores NuGet packages. Subsequent starts are much faster thanks to Docker layer caching.
+
+### 3. Access the Application
+
+| Service | URL |
+|---------|-----|
+| **Web App** | [http://localhost:8080](http://localhost:8080) |
+| **Qdrant Dashboard** | [http://localhost:6333/dashboard](http://localhost:6333/dashboard) |
+| **PostgreSQL** | `localhost:5432` (connect via `psql`, pgAdmin, etc.) |
+
+> [!NOTE]
+> The app container waits for both PostgreSQL and Qdrant to pass their health checks before starting. EF Core migrations are applied automatically on first launch.
+
+### 4. Useful Commands
+
+```bash
+# View real-time logs (all services)
+docker compose logs -f
+
+# View logs for a specific service
+docker compose logs -f app
+
+# Stop all services (preserves data volumes)
+docker compose down
+
+# Stop and remove all data (fresh start)
+docker compose down -v
+
+# Rebuild only the app after code changes
+docker compose up -d --build app
+```
+
+### Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────┐
+│                  Docker Compose                      │
+│                                                      │
+│  ┌──────────────┐  ┌───────────┐  ┌──────────────┐  │
+│  │  app          │  │ postgres  │  │   qdrant     │  │
+│  │  ASP.NET Core │  │ PG 17    │  │  Vector DB   │  │
+│  │  :8080        │→ │ :5432     │  │  :6333/:6334 │  │
+│  │              │→ │           │  │              │  │
+│  └──────────────┘  └───────────┘  └──────────────┘  │
+│         ↓                ↓               ↓           │
+│   (host:8080)      (host:5432)    (host:6333/6334)   │
+└─────────────────────────────────────────────────────┘
+```
+
+### Container Details
+
+| Container | Image | Ports | Volume |
+|-----------|-------|-------|--------|
+| `aisupport-app` | Built from `Dockerfile` (multi-stage .NET 10) | `8080:8080` | — |
+| `aisupport-postgres` | `postgres:17-alpine` | `5432:5432` | `postgres_data` |
+| `aisupport-qdrant` | `qdrant/qdrant:latest` | `6333:6333`, `6334:6334` | `qdrant_data` |
+
+---
+
 ## UI/UX Standards
 
 | Aspect | Standard |
@@ -245,9 +346,9 @@ VALUES ('YOUR_USER_ID', 'YOUR_ADMIN_ID');
   
 - [x] RAG Pipeline integration with Gemini AI & Qdrant
 - [x] Recursive Character Text Splitting with `cl100k_base`
+- [x] Docker Compose setup for local environment
 - [ ] Interface-based abstractions for full testability  
 - [ ] Server-side HTML sanitization for LLM output  
-- [ ] Docker Compose setup for local environment
 
 ## License
 
